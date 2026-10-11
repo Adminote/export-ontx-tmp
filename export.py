@@ -1,12 +1,10 @@
 """
 Export PP-DocLayout-M inference model → ONNX
-Using paddle2onnx 0.9.2 with CORRECT parameter names (model_filename, params_filename)
+Using paddle2onnx 0.9.2 with CORRECT parameter names
 """
-import os, sys
+import os, sys, subprocess
 
 print("Installing paddle2onnx...")
-# Install paddle2onnx inside the script to ensure Linux wheel
-import subprocess
 subprocess.run(["pip", "install", "paddle2onnx==0.9.2", "-q"], check=True)
 
 import paddle2onnx
@@ -18,10 +16,8 @@ assert os.path.exists(model_json), f"Missing {model_json}"
 assert os.path.exists(params_file), f"Missing {params_file}"
 
 print(f"paddle2onnx version: {paddle2onnx.__version__}")
-print(f"Exporting: {model_json} + {params_file}")
 
 # paddle2onnx 0.9.2 signature: export(model_filename, params_filename, save_file, ...)
-# NO model_format param in 0.9.2 — it auto-detects
 paddle2onnx.export(
     model_filename=model_json,
     params_filename=params_file,
@@ -43,4 +39,4 @@ out = sess.run(None, {
     "scale_factor": np.array([[0.43, 0.30]], dtype=np.float32),
 })
 print(f"[3] ✅ Verify OK! output shapes = {[o.shape for o in out]}")
-print(f"\n🎉🎉🎉 DONE! Download PP-DocLayout-M.onnx")
+print(f"\n🎉🎉🎉 DONE! Download PP-DocLayout-M.onnx from Artifacts")

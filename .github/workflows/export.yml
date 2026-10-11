@@ -1,5 +1,7 @@
 name: Export ONNX
 on:
+  push:
+    branches: [main]
   workflow_dispatch: {}
 jobs:
   export:
