@@ -1,20 +1,18 @@
-name: Export PP-DocLayout-M ONNX
-
+name: Export ONNX
 on:
-  workflow_dispatch: {}  # 手动触发
-
+  workflow_dispatch: {}
 jobs:
   export:
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install deps
-        run: |
-          pip install paddlepaddle paddle2onnx -q
+      - name: Install paddle + onnxruntime
+        run: pip install paddlepaddle onnxruntime -q
 
       - name: Download model
         run: |
@@ -22,31 +20,10 @@ jobs:
           tar xf PP-DocLayout-M_infer.tar
           ls -lh PP-DocLayout-M_infer/
 
-      - name: Export ONNX
-        run: |
-          python -c "
-import paddle2onnx, os
-paddle2onnx.export(
-    model_file='PP-DocLayout-M_infer/inference.json',
-    params_file='PP-DocLayout-M_infer/inference.pdiparams',
-    save_file='PP-DocLayout-M_infer.onnx',
-    opset_version=13, model_format='inference')
-sz = os.path.getsize('PP-DocLayout-M_infer.onnx')
-print(f'✅ {sz/1024/1024:.1f}MB')
-"
+      - name: Export
+        run: python export.py
 
-      - name: Verify ONNX
-        run: |
-          pip install onnxruntime onnx -q && python -c "
-import onnxruntime as ort, numpy as np
-sess = ort.InferenceSession('PP-DocLayout-M_infer.onnx', providers=['CPUExecutionProvider'])
-out = sess.run(None, {'image': np.random.randn(1,3,640,640).astype(np.float32),
-                       'scale_factor': np.array([[0.43, 0.30]], dtype=np.float32)})
-print(f'✅ outputs={[o.shape for o in out]}')
-"
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          name: pp-doclayout-m-onnx
-          path: PP-DocLayout-M_infer.onnx
+          name: onnx
+          path: PP-DocLayout-M.onnx
