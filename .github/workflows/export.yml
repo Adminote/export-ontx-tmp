@@ -11,7 +11,7 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install paddle + onnxruntime
+      - name: Install
         run: pip install paddlepaddle onnxruntime -q
 
       - name: Download model
