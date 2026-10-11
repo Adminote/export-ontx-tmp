@@ -13,9 +13,6 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install
-        run: pip install paddlepaddle onnxruntime -q
-
       - name: Download model
         run: |
           wget -q "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/PP-DocLayout-M_infer.tar"
